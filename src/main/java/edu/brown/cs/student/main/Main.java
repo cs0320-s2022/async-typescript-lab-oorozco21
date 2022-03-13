@@ -128,7 +128,6 @@ public final class Main {
         e.printStackTrace();
       }
       // use the MatchMaker.makeMatches method to get matches
-      // TODO: create an immutable map using the matches
       Map<String, String> map = new HashMap<>();
       for (int i = 0; i < matches.size(); i++) {
         map.put(String.valueOf(i), matches.get(i));

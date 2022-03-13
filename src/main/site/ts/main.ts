@@ -5,11 +5,18 @@ const moon = document.querySelector('#moon') as HTMLInputElement
 const rising = document.querySelector('#rising') as HTMLInputElement
 
 // Here, when the value of sun is changed, we will call the method postAndUpdate.
-// TODO: Do the same for moon and rising
-let changed: boolean = false
-if (changed) {
-  postAndUpdate()
-}
+// Do the same for moon and rising
+let sunVal: String = sun.value
+let moonVal: String = moon.value
+let risingVal: String = rising.value
+setInterval(() => {
+  if (sunVal != sun.value || moonVal != moon.value || risingVal != rising.value) {
+    sunVal = sun.value
+    moonVal = moon.value
+    risingVal = rising.value
+    postAndUpdate()
+  }
+    }, 100)
 
 // Define a type for the request data object here.
 type MatchesRequestData = {
@@ -40,11 +47,11 @@ function postAndUpdate(): void {
 
   console.log(postParameters)
 
+  let matchData: string[] = new Array(5)
   //  make a POST request using fetch to the URL to handle this request you set in your Main.java
   //  HINT: check out the POST REQUESTS section of the lab and of the front-end guide.
   //  Make sure you add "Access-Control-Allow-Origin":"*" to your headers.
   //  Remember to add a type annotation for the response data using the Matches type you defined above!
-  let matchData: Matches;
   fetch('http://localhost:4567/results', {
     method: 'post',
     body: JSON.stringify(postParameters),
@@ -53,22 +60,26 @@ function postAndUpdate(): void {
     },
   })
       .then((response: Response) => response.json())
-      .then((data) => matchData = JSON.parse(data))
-      .then(matchData => updateSuggestions(matchData))
+      .then((data:{[key: string]: Matches}) => {
+        for (let i = 0; i < matchData.length; i++) {
+          matchData[i] = data[i.toLocaleString()].toString()
+        }
+        updateSuggestions(matchData)
+      })
 
-  // TODO: Call and fill in the updateSuggestions method in one of the .then statements in the Promise
+  // Call and fill in the updateSuggestions method in one of the .then statements in the Promise
   //  Parse the JSON in the response object
   //  HINT: remember to get the specific field in the JSON you want to use
 }
 
 function updateSuggestions(matches: string[]): void {
-  // TODO: for each element in the set of matches, append it to the suggestionList
+  // for each element in the set of matches, append it to the suggestionList
   //  HINT: use innerHTML += to append to the suggestions list
   //  NOTE: you should use <li> (list item) tags to wrap each element. When you do so,
   //  make sure to add the attribute 'tabindex="0"' (for example: <li tabindex="0">{your element}</li>).
   //  This makes each element selectable via screen reader.
   for (let i = 0; i < matches.length; i++) {
-    suggestionList.innerHTML += `<li tabindex="0">matches[i]</li>`
+    suggestionList.innerHTML += `<li tabindex="0">Match ${i + 1} - ${matches[i]}</li>`
   }
 }
 
